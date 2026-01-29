@@ -15,7 +15,6 @@ import java.util.Map;
 public class SellerDaoJDBC implements SellerDao {
 
     private Connection connection;
-
     public SellerDaoJDBC(Connection connection) {
         this.connection = connection;
     }
@@ -26,6 +25,7 @@ public class SellerDaoJDBC implements SellerDao {
         PreparedStatement preparedStatement = null;
 
         try {
+
             preparedStatement = connection.prepareStatement(
                     "INSERT INTO seller " +
                             "(Name, Email, BirthDate, BaseSalary, DepartmentId) " +
@@ -42,11 +42,14 @@ public class SellerDaoJDBC implements SellerDao {
 
             if (rowsAffected > 0) {
                 ResultSet resultSet = preparedStatement.getGeneratedKeys();
+
                 if (resultSet.next()) {
                     int id = resultSet.getInt(1);
                     seller.setId(id);
                 }
+
                 DB.closeResultSet(resultSet);
+
             } else {
                 throw new DBException("Expected error! No rows affected!");
             }
@@ -58,19 +61,19 @@ public class SellerDaoJDBC implements SellerDao {
         finally {
             DB.closeStatement(preparedStatement);
         }
-
     }
 
     @Override
     public void update(Seller seller) {
+
         PreparedStatement preparedStatement = null;
 
         try {
+
             preparedStatement = connection.prepareStatement(
                     "UPDATE seller " +
                             "SET Name = ?, Email = ?, BirthDate = ?, BaseSalary = ?, DepartmentId = ? " +
-                            "WHERE Id = ?",
-                    Statement.RETURN_GENERATED_KEYS
+                            "WHERE Id = ?"
             );
             preparedStatement.setString(1, seller.getName());
             preparedStatement.setString(2, seller.getEmail());
@@ -214,7 +217,6 @@ public class SellerDaoJDBC implements SellerDao {
             Map<Integer, Department> departmentMap = new HashMap<>();
 
             while (resultSet.next()) {
-
                 int departmentId = resultSet.getInt("DepartmentId");
                 Department dep = departmentMap.get(departmentId);
 
